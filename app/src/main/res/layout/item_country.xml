@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="150dp"
+    android:layout_height="200dp"
+    android:layout_marginEnd="@dimen/margin_medium"
+    app:cardCornerRadius="16dp">
+
+    <ImageView
+        android:id="@+id/ivCountry"
+        android:layout_width="150dp"
+        android:layout_height="200dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/hotel_sg"/>
+
+    <TextView
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|left"
+        android:textColor="#FFF"
+        android:background="#AA8c8585"
+        android:layout_marginTop="@dimen/margin_medium"
+        android:layout_marginLeft="@dimen/margin_medium"
+        android:text="New"/>
+
+    <TextView
+        android:id="@+id/tvCountryName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/text_regular_3x"
+        android:layout_gravity="bottom|left"
+        android:textColor="#FFF"
+        android:layout_marginLeft="@dimen/margin_medium"
+        android:layout_marginBottom="40dp"
+        android:text="Thailand"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/text_regular"
+        android:layout_gravity="bottom|left"
+        android:layout_marginLeft="@dimen/margin_medium"
+        android:layout_marginBottom="16dp"
+        android:textColor="#FFF"
+        android:text="18 Tours"/>
+
+    <TextView
+        android:id="@+id/tvCountryRating"
+        android:layout_width="30dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|right"
+        android:textColor="#FFF"
+        android:layout_marginBottom="40dp"
+        android:layout_marginRight="8dp"
+        android:text="4.5"/>
+
+    <ImageView
+        android:layout_width="30dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|right"
+        android:src="@drawable/ic_star_white"
+        android:layout_marginRight="@dimen/margin_medium"
+        android:layout_marginBottom="16dp"/>
+
+</com.google.android.material.card.MaterialCardView>

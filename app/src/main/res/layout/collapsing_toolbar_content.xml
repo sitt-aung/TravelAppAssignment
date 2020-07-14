@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/ivBack"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_gravity="top|left"
+        android:layout_marginLeft="@dimen/margin_medium"
+        android:layout_marginTop="@dimen/margin_medium"
+        android:src="@drawable/ic_back_white"/>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left|bottom">
+
+        <org.mmtextview.components.MMTextView
+            android:id="@+id/tvDetailName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sea Flower Resort"
+            android:layout_marginLeft="@dimen/margin_medium"
+            android:layout_marginBottom="@dimen/margin_medium"
+            android:textSize="@dimen/text_heading_1x"
+            android:textColor="@color/colorPrimary"/>
+
+        <org.mmtextview.components.MMTextView
+            android:id="@+id/tvDetailLocation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvDetailName"
+            android:text="Koh Chang Tai, Thailand"
+            android:layout_marginLeft="@dimen/margin_medium"
+            android:layout_marginBottom="@dimen/margin_medium"
+            android:textSize="@dimen/text_regular_2x"
+            android:textColor="@color/colorPrimary"/>
+
+<!--        <ImageView-->
+<!--            android:id="@+id/ivRating"-->
+<!--            android:layout_width="30dp"-->
+<!--            android:layout_height="30dp"-->
+<!--            android:layout_below="@+id/tvLocation"-->
+<!--            android:layout_marginLeft="@dimen/margin_medium"-->
+<!--            android:src="@drawable/ic_star_white"/>-->
+
+        <RatingBar
+            android:id="@+id/rbDetailRating"
+            style="@style/Widget.AppCompat.RatingBar.Small"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:numStars="5"
+            android:layout_marginLeft="@dimen/margin_medium"
+            android:progressTint="@android:color/white"
+            android:padding="8dp"
+            android:layout_below="@+id/tvDetailLocation"
+            android:rating="4.0"
+            android:stepSize="1"/>
+
+        <org.mmtextview.components.MMTextView
+            android:id="@+id/tvDetailRating"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:layout_below="@+id/tvDetailLocation"
+            android:layout_toRightOf="@+id/rbDetailRating"
+            android:layout_marginLeft="@dimen/margin_medium"
+            android:layout_marginBottom="@dimen/margin_medium"
+            android:text="4.0"
+            android:textSize="@dimen/text_regular_2x"
+            android:gravity="center"
+            android:textColor="@color/colorPrimary"/>
+
+    </RelativeLayout>
+</FrameLayout>
