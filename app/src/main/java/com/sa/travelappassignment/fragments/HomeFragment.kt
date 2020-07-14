@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.sa.travelappassignment.R
 import com.sa.travelappassignment.activities.DetailActivity
@@ -17,6 +18,9 @@ import com.sa.travelappassignment.data.vos.CountryVO
 import com.sa.travelappassignment.data.vos.TourVO
 import com.sa.travelappassignment.delegates.CountryDelegate
 import com.sa.travelappassignment.delegates.TourDelegate
+import com.sa.travelappassignment.mvp.presenters.HomePresenter
+import com.sa.travelappassignment.mvp.presenters.HomePresenterImpl
+import com.sa.travelappassignment.mvp.views.HomeView
 import com.sa.travelappassignment.views.viewpods.EmptyViewPod
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -24,21 +28,17 @@ import io.reactivex.rxkotlin.addTo
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_home.*
 
-class HomeFragment : BaseFragment(), CountryDelegate, TourDelegate {
+class HomeFragment : BaseFragment(), HomeView {
 
     private lateinit var viewPodEmpty: EmptyViewPod
+    private lateinit var mPresenter: HomePresenter
 
-    private val mTravelModel: TravelModel = TravelModelImpl
     private lateinit var mCountriesListAdapter: CountriesListAdapter
     private lateinit var mToursListAdapter: ToursListAdapter
 
-    private var countriesList: MutableLiveData<List<CountryVO>> = MutableLiveData()
-    private var toursList: MutableLiveData<List<TourVO>> = MutableLiveData()
-
-    private val compositeDisposable = CompositeDisposable()
-
-    companion object {
-        fun newInstance(): HomeFragment = HomeFragment()
+    private fun setUpPresenter() {
+        mPresenter = ViewModelProviders.of(this).get(HomePresenterImpl::class.java)
+        mPresenter.initPresenter(this)
     }
 
     override fun onCreateView(
@@ -51,31 +51,17 @@ class HomeFragment : BaseFragment(), CountryDelegate, TourDelegate {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        setUpPresenter()
         setUpRecyclerView()
-        setUpSwipeRefresh()
-        requestData()
         setUpViewPod()
+        setUpSwipeRefresh()
 
-        countriesList.observe(this, Observer {
-            if (it.isEmpty()) showEmptyView()
-            else {
-                hideEmptyView()
-                mCountriesListAdapter.setNewData(it.toMutableList())
-            }
-        })
-        toursList.observe(this, Observer {
-            if (it.isEmpty()) showEmptyView()
-            else {
-                hideEmptyView()
-                mToursListAdapter.setNewData(it.toMutableList())
-            }
-        })
+        mPresenter.onUIReady(this)
     }
 
     private fun setUpRecyclerView(){
-        mCountriesListAdapter = CountriesListAdapter(this)
-        mToursListAdapter = ToursListAdapter(this)
+        mCountriesListAdapter = CountriesListAdapter(mPresenter)
+        mToursListAdapter = ToursListAdapter(mPresenter)
 
         val countryLayoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         val tourLayoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
@@ -88,26 +74,7 @@ class HomeFragment : BaseFragment(), CountryDelegate, TourDelegate {
     }
 
     private fun setUpSwipeRefresh() {
-        swipeRefreshLayout.setOnRefreshListener { requestData() }
-    }
-
-    private fun requestData() {
-        swipeRefreshLayout.isRefreshing = true
-
-        mTravelModel.getAllCountriesAndTours()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({
-                swipeRefreshLayout.isRefreshing = false
-                hideEmptyView()
-                countriesList.postValue(it.countries)
-                toursList.postValue(it.tours)
-            }, {
-                swipeRefreshLayout.isRefreshing = false
-                showEmptyView()
-                showSnackbar(it.localizedMessage ?: "Unknown Error ...")
-            }
-            ).addTo(compositeDisposable)
+        swipeRefreshLayout.setOnRefreshListener { mPresenter.onSwipeRefresh(this) }
     }
 
     private fun setUpViewPod() {
@@ -123,22 +90,45 @@ class HomeFragment : BaseFragment(), CountryDelegate, TourDelegate {
         vpEmpty.visibility = View.VISIBLE
     }
 
-    private fun hideEmptyView() {
+    override fun displayCountriesList(countriesList: List<CountryVO>) {
+        mCountriesListAdapter.setNewData(countriesList.toMutableList())
+    }
+
+    override fun displayToursList(toursList: List<TourVO>) {
+        mToursListAdapter.setNewData(toursList.toMutableList())
+    }
+
+    override fun navigateToCountryDetails(name: String) {
+        startActivity(DetailActivity.newIntent(context!!, name, DetailActivity.countriesTable))
+    }
+
+    override fun navigateToTourDetails(name: String) {
+        startActivity(DetailActivity.newIntent(context!!, name, DetailActivity.toursTable))
+    }
+
+    override fun displayEmptyView() {
+        homeLayout.visibility = View.GONE
+        vpEmpty.visibility = View.VISIBLE
+    }
+
+    override fun hideEmptyView() {
         homeLayout.visibility = View.VISIBLE
         vpEmpty.visibility = View.GONE
     }
 
-    override fun onTapCountry(name: String) {
-        startActivity(DetailActivity.newIntent(context!!, name, DetailActivity.countriesTable))
-//        startActivity(DetailActivity.newIntent(context!!))
+    override fun enableSwipeRefresh() {
+        swipeRefreshLayout.isRefreshing = true
     }
 
-    override fun onTapTour(name: String) {
-        startActivity(DetailActivity.newIntent(context!!, name, DetailActivity.toursTable))
+    override fun disableSwipeRefresh() {
+        swipeRefreshLayout.isRefreshing = false
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        compositeDisposable.clear()
+    override fun displayError(error: String) {
+        showSnackbar(error)
+    }
+
+    companion object {
+        fun newInstance(): HomeFragment = HomeFragment()
     }
 }

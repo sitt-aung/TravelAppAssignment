@@ -2,6 +2,7 @@ package com.sa.travelappassignment.data.models.impls
 
 import android.util.Log
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.sa.travelappassignment.data.models.BaseModel
 import com.sa.travelappassignment.data.models.TravelModel
 import com.sa.travelappassignment.data.vos.CountriesAndToursVO
@@ -14,17 +15,26 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 
-object TravelModelImpl : BaseModel(), TravelModel {
+object TravelModelImpl : TravelModel, BaseModel() {
+
+    override val countriesLiveData: MutableLiveData<List<CountryVO>>
+        get() = MutableLiveData(mTravelDB.travelDao().getAllCountries())
+    override val toursLiveData: MutableLiveData<List<TourVO>>
+        get() = MutableLiveData(mTravelDB.travelDao().getAllTours())
 
     override fun getAllCountriesAndTours(): Observable<CountriesAndToursVO> =
         Observable.zip(
             mTravelApi.getAllCountries(),
             mTravelApi.getAllTours(),
             BiFunction<GetAllCountriesResponse, GetAllToursResponse, CountriesAndToursVO> { countries, tours ->
+
+                var countryId = 1
+                var tourId = 1
+
                 mTravelDB.travelDao().deleteAllCountries()
                 mTravelDB.travelDao().deleteAllTours()
-                mTravelDB.travelDao().insertAllCountries(countries.data ?: listOf())
-                mTravelDB.travelDao().insertAllTours(tours.data ?: listOf())
+                mTravelDB.travelDao().insertAllCountries(countries.data?.map {it.copy(id = countryId++)} ?: listOf())
+                mTravelDB.travelDao().insertAllTours(tours.data?.map {it.copy(id = tourId++)} ?: listOf())
                 return@BiFunction CountriesAndToursVO(
                     mTravelDB.travelDao().getAllCountries(),
                     mTravelDB.travelDao().getAllTours())
@@ -39,7 +49,7 @@ object TravelModelImpl : BaseModel(), TravelModel {
         return mTravelDB.travelDao().getTourByName(name)
     }
 
-    //    override fun getAllCountriesAndTours(): Observable<CountriesAndToursVO> {
+//        override fun getAllCountriesAndTours(): Observable<CountriesAndToursVO> {
 //        val countries = mTravelApi.getAllCountries().map { it.data.toList() }.subscribeOn(Schedulers.io())
 //        val tours = mTravelApi.getAllTours().map { it.data.toList() }.subscribeOn(Schedulers.io())
 //

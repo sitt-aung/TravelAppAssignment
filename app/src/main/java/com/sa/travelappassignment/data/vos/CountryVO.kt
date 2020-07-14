@@ -11,11 +11,11 @@ import com.sa.travelappassignment.persistence.typeconverters.StringListTypeConve
 @TypeConverters(ScoresAndReviewsTypeConverter::class, StringListTypeConverter::class)
 data class CountryVO (
     @PrimaryKey (autoGenerate = true)
-    val id: Int = 0,
-    @SerializedName("name") val name: String = "",
-    @SerializedName("description") val description: String = "",
-    @SerializedName("location") val location: String = "",
-    @SerializedName("average_rating") val averageRating: Double = 0.0,
-    @SerializedName("scores_and_reviews") val scoresAndReviewVOS: ArrayList<ScoresAndReviewsVO> = arrayListOf(),
-    @SerializedName("photos") val photos: ArrayList<String>? = arrayListOf()
-): TravelVO()
+    var id: Int = 0,
+    @SerializedName("name") var name: String = "",
+    @SerializedName("description") var description: String = "",
+    @SerializedName("location") var location: String = "",
+    @SerializedName("average_rating") var averageRating: Double = 0.0,
+    @SerializedName("scores_and_reviews") var scoresAndReviewVOS: ArrayList<ScoresAndReviewsVO>? = null,
+    @SerializedName("photos") var photos: ArrayList<String>? = null
+)

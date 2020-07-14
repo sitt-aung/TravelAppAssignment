@@ -18,4 +18,4 @@ data class TourVO (
     @SerializedName("average_rating") val averageRating: Double = 0.0,
     @SerializedName("scores_and_reviews") val scoresAndReviewVOS: ArrayList<ScoresAndReviewsVO>? = arrayListOf(),
     @SerializedName("photos") val photos: ArrayList<String>? = arrayListOf()
-): TravelVO()
+)

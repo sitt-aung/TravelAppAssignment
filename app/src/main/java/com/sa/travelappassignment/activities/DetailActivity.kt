@@ -3,6 +3,7 @@ package com.sa.travelappassignment.activities
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.lifecycle.ViewModelProviders
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.sa.travelappassignment.R
@@ -10,18 +11,25 @@ import com.sa.travelappassignment.data.models.TravelModel
 import com.sa.travelappassignment.data.models.impls.TravelModelImpl
 import com.sa.travelappassignment.data.vos.CountryVO
 import com.sa.travelappassignment.data.vos.TourVO
+import com.sa.travelappassignment.data.vos.TravelVO
+import com.sa.travelappassignment.mvp.presenters.DetailPresenter
+import com.sa.travelappassignment.mvp.presenters.DetailPresenterImpl
+import com.sa.travelappassignment.mvp.views.DetailView
 import kotlinx.android.synthetic.main.activity_detail.*
 import kotlinx.android.synthetic.main.collapsing_toolbar_content.*
 import kotlinx.android.synthetic.main.detail_content.*
 
-class DetailActivity : BaseActivity() {
-
-    private val mTravelModel: TravelModel = TravelModelImpl
+class DetailActivity : BaseActivity(), DetailView {
 
     private var tableName: String = ""
     private var name: String = ""
-    var countryVO: CountryVO? = null
-    var tourVO: TourVO? = null
+
+    private lateinit var mPresenter: DetailPresenter
+
+    private fun setUpPresenter() {
+        mPresenter = ViewModelProviders.of(this).get(DetailPresenterImpl::class.java)
+        mPresenter.initPresenter(this)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,46 +38,21 @@ class DetailActivity : BaseActivity() {
         name = intent.getStringExtra(IE_TOUR_NAME) ?: ""
         tableName = intent.getStringExtra(IE_TABLE_NAME) ?: ""
 
-        bindData()
+        setUpPresenter()
+        mPresenter.onUIReady(this, name, tableName)
     }
 
-    private fun bindData(){
-        when (tableName){
-            countriesTable -> {
-                countryVO = mTravelModel.getCountryByName(name)
-                bindCountry(countryVO as CountryVO)
-            }
-            toursTable -> {
-                tourVO = mTravelModel.getTourByName(name)
-                bindTour(tourVO as TourVO)
-            }
-        }
-    }
-
-    private fun bindCountry(countryVO: CountryVO){
+    private fun bindData(travelVO: TravelVO){
         Glide.with(this)
-            .load(countryVO.photos?.get(1))
+            .load(travelVO.photos?.get(1))
             .apply(RequestOptions().centerCrop())
             .into(ivDetailImage)
 
-        tvDetailName.text = countryVO.name
-        tvDetailLocation.text = countryVO.location
-        rbDetailRating.rating = countryVO.averageRating.toFloat()
-        tvDetailRating.text = countryVO.averageRating.toString()
-        tvDetailDescription.text = countryVO.description
-    }
-
-    private fun bindTour(tourVO: TourVO){
-        Glide.with(this)
-            .load(tourVO.photos?.get(1))
-            .apply(RequestOptions().centerCrop())
-            .into(ivDetailImage)
-
-        tvDetailName.text = tourVO.name
-        tvDetailLocation.text = tourVO.location
-        rbDetailRating.rating = tourVO.averageRating.toFloat()
-        tvDetailRating.text = tourVO.averageRating.toString()
-        tvDetailDescription.text = tourVO.description
+        tvDetailName.text = travelVO.name
+        tvDetailLocation.text = travelVO.location
+        rbDetailRating.rating = travelVO.averageRating.toFloat()
+        tvDetailRating.text = travelVO.averageRating.toString()
+        tvDetailDescription.text = travelVO.description
     }
 
     companion object {
@@ -89,5 +72,9 @@ class DetailActivity : BaseActivity() {
             intent.putExtra(IE_TABLE_NAME, tableName)
             return intent
         }
+    }
+
+    override fun displayDetail(travelVO: TravelVO) {
+        bindData(travelVO)
     }
 }
